@@ -1,6 +1,6 @@
-# BLENDED_LERNING
 # Implementation-of-Multiple-Linear-Regression-Model-with-Cross-Validation-for-Predicting-Car-Prices
-
+### Developed by: Aaron H
+### RegisterNumber: 212223040001
 ## AIM:
 To write a program to predict the price of cars using a multiple linear regression model and evaluate the model performance using cross-validation.
 
@@ -9,98 +9,80 @@ To write a program to predict the price of cars using a multiple linear regressi
 2. Anaconda – Python 3.7 Installation / Jupyter notebook
 
 ## Algorithm
-1. **Import Libraries**:  
-   Bring in the necessary libraries.
+1. **Library Import**:  
+   - Import pandas, numpy, and scikit-learn for data manipulation and model building.  
 
-2. **Load the Dataset**:  
-   Load the dataset into your environment.
+2. **Dataset Loading**:  
+   - Load the dataset from `encoded_car_data.csv`.  
 
-3. **Data Preprocessing**:  
-   Handle any missing data and encode categorical variables as needed.
+3. **Feature and Target Selection**:  
+   - Define the features (X) and the target variable (y) for the model.  
 
-4. **Define Features and Target**:  
-   Split the dataset into features (X) and the target variable (y).
+4. **Data Splitting**:  
+   - Split the dataset into training and testing subsets, maintaining an 80-20 ratio.  
 
-5. **Split Data**:  
-   Divide the dataset into training and testing sets.
+5. **Model Training**:  
+   - Train a Multiple Linear Regression model using the training dataset.  
 
-6. **Build Multiple Linear Regression Model**:  
-   Initialize and create a multiple linear regression model.
+6. **Test Set Evaluation**:  
+   - Evaluate the model's predictions on the test set using metrics such as Mean Squared Error (MSE) and R² score.  
 
-7. **Train the Model**:  
-   Fit the model to the training data.
+7. **Cross-Validation**:  
+   - Perform 5-fold cross-validation to calculate MSE and R² values for more robust evaluation.  
 
-8. **Evaluate Performance**:  
-   Assess the model's performance using cross-validation.
+8. **Result Presentation**:  
+   - Display the evaluation metrics and cross-validation outcomes.  
 
-9. **Display Model Parameters**:  
-   Output the model’s coefficients and intercept.
-
-10. **Make Predictions & Compare**:  
-    Predict outcomes and compare them to the actual values. 
 
 ## Program:
 ```
-/*
-Program to implement the multiple linear regression model for predicting car prices with cross-validation.
-Developed by: Aaron H
-RegisterNumber: 212223040001
-*/
+# Program to implement the multiple linear regression model for predicting car prices with cross-validation.
 # Importing necessary libraries
 import pandas as pd
-import numpy as np
-import statsmodels.api as sm
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LinearRegression
-import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
 
 # Load the dataset
-data = pd.read_csv("https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-ML240EN-SkillsNetwork/labs/data/CarPrice_Assignment.csv")
+url = 'https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-ML240EN-SkillsNetwork/labs/encoded_car_data.csv'
+df = pd.read_csv(url)
 
-# Data preprocessing
-# Dropping unnecessary columns and handling categorical variables
-data = data.drop(['CarName', 'car_ID'], axis=1)
-data = pd.get_dummies(data, drop_first=True)
+# Select relevant features and target variable
+X = df.drop(columns=['price'])  # All columns except 'price'
+y = df['price']  # Target variable
 
-# Splitting the data into features and target variable
-X = data.drop('price', axis=1)
-y = data['price']
-
-# Splitting the dataset into training and testing sets
+# Split the dataset (not strictly required for cross-validation, but good for validation outside cross-validation)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Creating the model
+# Train the Multiple Linear Regression model
 model = LinearRegression()
-
-# Fitting the model on the training data
 model.fit(X_train, y_train)
 
-# Evaluating model performance using cross-validation
-cv_scores = cross_val_score(model, X, y, cv=5)
+# Evaluate on test set
+y_pred = model.predict(X_test)
+print("Test Set Evaluation:")
+print("Mean Squared Error (MSE):", mean_squared_error(y_test, y_pred))
+print("R-squared:", r2_score(y_test, y_pred))
 
-# Printing cross-validation scores
-print("Cross-validation scores:", cv_scores)
-print("Mean cross-validation score:", cv_scores.mean())
+# Cross-Validation
+cv_scores = cross_val_score(model, X, y, cv=5, scoring='neg_mean_squared_error')  # 5-fold CV
+cv_mse = -cv_scores  # Convert negative MSE to positive
+print("\nCross-Validation Results:")
+print("MSE for each fold:", cv_mse)
+print("Mean MSE:", np.mean(cv_mse))
+print("Standard Deviation of MSE:", np.std(cv_mse))
 
-# Print model coefficients
-print("Intercept:", model.intercept_)
-print("Coefficients:", model.coef_)
-
-# Make predictions
-predictions = model.predict(X_test)
-
-# Visualizing actual vs predicted prices
-plt.scatter(y_test, predictions)
-plt.xlabel("Actual Prices")
-plt.ylabel("Predicted Prices")
-plt.title("Actual vs Predicted Prices")
-plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red')  # Perfect prediction line
-plt.show()
+# Cross-Validation R-squared
+cv_r2_scores = cross_val_score(model, X, y, cv=5, scoring='r2')
+print("\nR-squared for each fold:", cv_r2_scores)
+print("Mean R-squared:", np.mean(cv_r2_scores))
+print("Standard Deviation of R-squared:", np.std(cv_r2_scores))
 
 ```
 
 ## Output:
-<img width="801" alt="Screenshot 2024-10-06 at 8 53 33 PM" src="https://github.com/user-attachments/assets/1a84f7be-ffb0-4073-b864-39555861f443">
+<img width="944" alt="Screenshot 2024-11-17 at 7 13 35 PM" src="https://github.com/user-attachments/assets/48c00439-b5b1-4fe6-aad7-f0a7d2583734">
 
 
 ## Result:
